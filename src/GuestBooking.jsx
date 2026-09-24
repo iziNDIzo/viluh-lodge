@@ -138,19 +138,20 @@ export default function GuestBooking() {
               className="mt-1 w-full rounded-lg border border-slate-300 p-2"
             />
           </label>
-
-          <label className="block text-sm font-medium">
-            Nights
-            <input
-              type="number"
-              min="1"
-              value={nights}
-              onChange={(e) =>
-                setNights(Math.max(1, Number(e.target.value) || 1))
-              }
-              className="mt-1 w-full rounded-lg border border-slate-300 p-2"
-            />
-          </label>
+<label className="block text-sm font-medium">
+  Number of nights
+  <select
+    value={nights}
+    onChange={(e) => setNights(Number(e.target.value))}
+    className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2"
+  >
+    {Array.from({ length: 30 }, (_, i) => i + 1).map((n) => (
+      <option key={n} value={n}>
+        {n} night{n > 1 ? 's' : ''}
+      </option>
+    ))}
+  </select>
+</label>
 
           {datesOk && (
             <p className="text-xs text-slate-500">

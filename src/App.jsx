@@ -1,8 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { rooms, bookings as initialBookings, addDays, today } from './data'
 
 const DAYS = 14
 const LODGE_NAME = 'Lakeview Lodge'
+
+const STORAGE_KEY = 'lodge-bookings-v1'
+
+function loadBookings() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return initialBookings
+    const { savedOn, bookings } = JSON.parse(raw)
+    const shift = Math.round((today.getTime() - savedOn) / 86400000)
+    return bookings
+      .map((b) => ({ ...b, start: b.start - shift }))
+      .filter((b) => b.start + b.nights > 0) // drop stays that already ended
+  } catch {
+    return initialBookings
+  }
+}
 
 const fmt = (date) =>
   date.toLocaleDateString('en', { day: 'numeric', month: 'short' })
@@ -26,7 +42,18 @@ function Stat({ label, value }) {
 }
 
 export default function App() {
-  const [bookings, setBookings] = useState(initialBookings)
+ const [bookings, setBookings] = useState(loadBookings)
+
+useEffect(() => {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ savedOn: today.getTime(), bookings })
+    )
+  } catch {
+    // storage unavailable, the app still works without saving
+  }
+}, [bookings])
   const [draft, setDraft] = useState(null)
   const [selected, setSelected] = useState(null)
   const [guest, setGuest] = useState('')
@@ -103,6 +130,13 @@ export default function App() {
     const number = toWaNumber(b.phone)
     return `https://wa.me/${number}?text=${encodeURIComponent(message)}`
   }
+
+  const resetDemo = () => {
+  if (window.confirm('Reset to the original demo bookings?')) {
+    setBookings(initialBookings)
+    setSelected(null)
+  }
+}
 
   const occupiedToday = rooms.filter((r) => bookingFor(r.id, 0)).length
   const arrivals = bookings.filter((b) => b.start === 0).length
@@ -184,6 +218,13 @@ export default function App() {
             </tbody>
           </table>
         </section>
+        <button
+  type="button"
+  onClick={resetDemo}
+  className="text-xs text-slate-400 underline"
+>
+  Reset demo data
+</button>
       </main>
 
       {/* New booking form */}

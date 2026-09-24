@@ -9,7 +9,7 @@ const palettes = {
 const lodges = {
   nezzer: {
     name: 'Nezzer Lodge',
-    phone: '0999 000 000', // WhatsApp number guests message
+    phone: '0884125795', // WhatsApp number guests message
     liveUrl: 'https://viluh-lodge.vercel.app', // used by the QR card
     palette: 'emerald',
     rooms: [

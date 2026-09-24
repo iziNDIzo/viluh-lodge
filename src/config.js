@@ -51,7 +51,7 @@ export function applyBrand() {
   const colors = palettes[lodge.palette] || palettes.blue
   const root = document.documentElement
   Object.entries(colors).forEach(([shade, value]) => {
-    root.style.setProperty(`--color-emerald-${shade}`, value)
+   root.style.setProperty(`--brand-${shade}`, value)
   })
   document.title = lodge.name
 }

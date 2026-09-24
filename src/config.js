@@ -11,7 +11,7 @@ const lodges = {
     name: 'Nezzer Lodge',
     phone: '0884125795', // WhatsApp number guests message
     liveUrl: 'https://viluh-lodge.vercel.app', // used by the QR card
-    palette: 'emerald',
+    palette: 'blue',
     rooms: [
       { id: 1, name: 'Room 1', type: 'Single', price: 35000 },
       { id: 2, name: 'Room 2', type: 'Double', price: 50000 },
@@ -48,10 +48,10 @@ export const lodge = lodges[key] || lodges.nezzer
 
 // Applies the brand color and the browser tab title
 export function applyBrand() {
-  const colors = palettes[lodge.palette] || palettes.blue
+  const colors = palettes[lodge.palette] || palettes.emerald
   const root = document.documentElement
   Object.entries(colors).forEach(([shade, value]) => {
-   root.style.setProperty(`--brand-${shade}`, value)
+    root.style.setProperty(`--color-emerald-${shade}`, value)
   })
   document.title = lodge.name
 }

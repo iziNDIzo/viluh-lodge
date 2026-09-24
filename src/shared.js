@@ -2,7 +2,7 @@ import { bookings as demoBookings, today } from './data'
 
 export const LODGE_NAME = 'Nezzer Lodge'
 // Put a WhatsApp number here (use your own while testing)
-export const LODGE_PHONE = '0999 000 000'
+export const LODGE_PHONE = '0884125795'
 
 const BOOKINGS_KEY = 'lodge-bookings-v1'
 export const REQUESTS_KEY = 'lodge-requests-v1'

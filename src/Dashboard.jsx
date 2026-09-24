@@ -212,9 +212,9 @@ export default function Dashboard() {
           </section>
         )}
         <TodaySummary bookings={bookings} onSelect={setSelected} />
-        <section className="grid grid-cols-3 gap-3">
+        <section className="grid grid-cols-2 gap-3">
           <Stat label="Occupancy" value={`${occupancy}%`} />
-          <Stat label="Arrivals today" value={arrivals} />
+         
           <Stat label="Free rooms" value={rooms.length - occupiedToday} />
         </section>
 

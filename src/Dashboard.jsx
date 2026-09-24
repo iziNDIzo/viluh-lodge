@@ -159,12 +159,14 @@ export default function Dashboard() {
       <header className="bg-slate-900 px-4 py-5 text-white">
         <p className="text-sm text-emerald-400">Powered by Viluh Systems</p>
         <h1 className="text-xl font-bold">{LODGE_NAME}</h1>
-        <a
-          href="#/book"
-          className="mt-2 inline-block text-xs text-emerald-300 underline"
-        >
-          View guest booking page →
-        </a>
+          <div className="mt-2 flex gap-4 text-xs text-emerald-300">
+          <a href="#/book" className="underline">
+            View guest booking page →
+          </a>
+          <a href="#/qr" className="underline">
+            Print QR card →
+          </a>
+        </div>
       </header>
 
       <main className="space-y-4 p-4">

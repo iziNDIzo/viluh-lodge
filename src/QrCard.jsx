@@ -1,8 +1,9 @@
 import { QRCodeSVG } from 'qrcode.react'
 import { LODGE_NAME } from './shared'
+import { lodge } from './config'
 
 export default function QrCard() {
- const LIVE_URL = 'https://viluh-lodge.vercel.app'
+ const LIVE_URL = lodge.liveUrl
 const base =
   window.location.hostname === 'localhost'
     ? LIVE_URL

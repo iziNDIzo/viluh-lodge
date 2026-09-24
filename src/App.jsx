@@ -2,6 +2,19 @@ import { useState } from 'react'
 import { rooms, bookings as initialBookings, addDays, today } from './data'
 
 const DAYS = 14
+const LODGE_NAME = 'Lakeview Lodge'
+
+const fmt = (date) =>
+  date.toLocaleDateString('en', { day: 'numeric', month: 'short' })
+
+// Turns 0991234567 or +265 991 234 567 into 265991234567 for WhatsApp
+const toWaNumber = (phone = '') => {
+  let d = phone.replace(/\D/g, '')
+  if (d.startsWith('00')) d = d.slice(2)
+  if (d.startsWith('0')) d = '265' + d.slice(1)
+  else if (d.length === 9) d = '265' + d
+  return d
+}
 
 function Stat({ label, value }) {
   return (
@@ -15,7 +28,9 @@ function Stat({ label, value }) {
 export default function App() {
   const [bookings, setBookings] = useState(initialBookings)
   const [draft, setDraft] = useState(null)
+  const [selected, setSelected] = useState(null)
   const [guest, setGuest] = useState('')
+  const [phone, setPhone] = useState('')
   const [nights, setNights] = useState(1)
   const [error, setError] = useState('')
 
@@ -32,6 +47,7 @@ export default function App() {
   const openDraft = (roomId, start) => {
     setDraft({ roomId, start })
     setGuest('')
+    setPhone('')
     setNights(1)
     setError('')
   }
@@ -52,35 +68,55 @@ export default function App() {
       setError('These dates overlap an existing booking')
       return
     }
-    setBookings([
-      ...bookings,
-      {
-        id: Date.now(),
-        roomId: draft.roomId,
-        guest: guest.trim(),
-        start: draft.start,
-        nights,
-      },
-    ])
+    const newBooking = {
+      id: Date.now(),
+      roomId: draft.roomId,
+      guest: guest.trim(),
+      phone: phone.trim(),
+      start: draft.start,
+      nights,
+    }
+    setBookings([...bookings, newBooking])
     setDraft(null)
+    setSelected(newBooking) // show the WhatsApp confirmation straight away
   }
 
   const cancelBooking = (b) => {
     if (window.confirm(`Cancel ${b.guest}'s booking?`)) {
       setBookings(bookings.filter((x) => x.id !== b.id))
+      setSelected(null)
     }
+  }
+
+  const whatsappLink = (b) => {
+    const room = rooms.find((r) => r.id === b.roomId)
+    const checkIn = fmt(addDays(today, b.start))
+    const checkOut = fmt(addDays(today, b.start + b.nights))
+    const total = (b.nights * room.price).toLocaleString()
+    const message =
+      `Hello ${b.guest}, your booking at ${LODGE_NAME} is confirmed.\n\n` +
+      `Room: ${room.name} (${room.type})\n` +
+      `Check-in: ${checkIn}\n` +
+      `Check-out: ${checkOut} (${b.nights} night${b.nights > 1 ? 's' : ''})\n` +
+      `Total: MK ${total}\n\n` +
+      `We look forward to hosting you!`
+    const number = toWaNumber(b.phone)
+    return `https://wa.me/${number}?text=${encodeURIComponent(message)}`
   }
 
   const occupiedToday = rooms.filter((r) => bookingFor(r.id, 0)).length
   const arrivals = bookings.filter((b) => b.start === 0).length
   const occupancy = Math.round((occupiedToday / rooms.length) * 100)
   const draftRoom = draft ? rooms.find((r) => r.id === draft.roomId) : null
+  const selectedRoom = selected
+    ? rooms.find((r) => r.id === selected.roomId)
+    : null
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
       <header className="bg-slate-900 px-4 py-5 text-white">
         <p className="text-sm text-emerald-400">Powered by Viluh Systems</p>
-        <h1 className="text-xl font-bold">Lakeview Lodge</h1>
+        <h1 className="text-xl font-bold">{LODGE_NAME}</h1>
       </header>
 
       <main className="space-y-4 p-4">
@@ -91,7 +127,8 @@ export default function App() {
         </section>
 
         <p className="text-xs text-slate-500">
-          Tap an empty day to add a booking. Tap a green block to cancel it.
+          Tap an empty day to add a booking. Tap a green block to message the
+          guest or cancel.
         </p>
 
         <section className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -128,7 +165,7 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() =>
-                            b ? cancelBooking(b) : openDraft(room.id, i)
+                            b ? setSelected(b) : openDraft(room.id, i)
                           }
                           title={b ? b.guest : 'Available'}
                           className={`h-10 w-full cursor-pointer rounded-md px-1 text-left text-xs ${
@@ -149,6 +186,7 @@ export default function App() {
         </section>
       </main>
 
+      {/* New booking form */}
       {draft && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
           <div className="w-full max-w-sm space-y-4 rounded-t-2xl bg-white p-5 sm:rounded-2xl">
@@ -164,55 +202,133 @@ export default function App() {
               </p>
             </div>
 
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium">
               Guest name
               <input
-                autoFocus
                 value={guest}
-                onChange={(e) => {
-                  setGuest(e.target.value)
-                  setError('')
-                }}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                placeholder="Enter guest name"
+                onChange={(e) => setGuest(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+                placeholder="e.g. Chisomo"
+                autoFocus
               />
             </label>
 
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium">
+              WhatsApp number (optional)
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+                placeholder="e.g. 0991 234 567"
+              />
+            </label>
+
+            <label className="block text-sm font-medium">
               Nights
               <input
                 type="number"
                 min="1"
-                max={DAYS - draft.start}
                 value={nights}
                 onChange={(e) =>
-                  setNights(
-                    Math.max(
-                      1,
-                      Math.min(DAYS - draft.start, Number(e.target.value) || 1)
-                    )
-                  )
+                  setNights(Math.max(1, Number(e.target.value) || 1))
                 }
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                className="mt-1 w-full rounded-lg border border-slate-300 p-2"
               />
             </label>
 
+            <p className="text-sm">
+              Total:{' '}
+              <span className="font-bold">
+                MK {(nights * draftRoom.price).toLocaleString()}
+              </span>
+            </p>
+
             {error && <p className="text-sm text-red-600">{error}</p>}
 
-            <div className="flex justify-end gap-2">
+            <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setDraft(null)}
-                className="rounded-lg px-4 py-2 text-sm text-slate-600 hover:bg-slate-100"
+                className="flex-1 rounded-lg border border-slate-300 p-2 font-medium"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={saveBooking}
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                className="flex-1 rounded-lg bg-emerald-500 p-2 font-medium text-white hover:bg-emerald-600"
               >
                 Save booking
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Booking details + WhatsApp */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
+          <div className="w-full max-w-sm space-y-4 rounded-t-2xl bg-white p-5 sm:rounded-2xl">
+            <div>
+              <h2 className="text-lg font-bold">{selected.guest}</h2>
+              <p className="text-sm text-slate-500">
+                {selectedRoom.name} ({selectedRoom.type})
+              </p>
+            </div>
+
+            <div className="space-y-1 rounded-lg bg-slate-50 p-3 text-sm">
+              <p>
+                <span className="text-slate-500">Check-in:</span>{' '}
+                {fmt(addDays(today, selected.start))}
+              </p>
+              <p>
+                <span className="text-slate-500">Check-out:</span>{' '}
+                {fmt(addDays(today, selected.start + selected.nights))} (
+                {selected.nights} night{selected.nights > 1 ? 's' : ''})
+              </p>
+              <p>
+                <span className="text-slate-500">Total:</span>{' '}
+                <span className="font-bold">
+                  MK {(selected.nights * selectedRoom.price).toLocaleString()}
+                </span>
+              </p>
+              {selected.phone && (
+                <p>
+                  <span className="text-slate-500">Phone:</span>{' '}
+                  {selected.phone}
+                </p>
+              )}
+            </div>
+
+            <a
+              href={whatsappLink(selected)}
+              target="_blank"
+              rel="noreferrer"
+              className="block rounded-lg bg-green-600 p-3 text-center font-medium text-white hover:bg-green-700"
+            >
+              Confirm on WhatsApp
+            </a>
+            {!selected.phone && (
+              <p className="text-xs text-slate-500">
+                No number saved, so WhatsApp will let you pick the contact.
+              </p>
+            )}
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => cancelBooking(selected)}
+                className="flex-1 rounded-lg border border-red-300 p-2 font-medium text-red-600 hover:bg-red-50"
+              >
+                Cancel booking
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                className="flex-1 rounded-lg border border-slate-300 p-2 font-medium"
+              >
+                Close
               </button>
             </div>
           </div>

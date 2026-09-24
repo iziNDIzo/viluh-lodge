@@ -12,7 +12,7 @@ import {
   loadRequests,
   saveRequests,
 } from './shared'
-
+import TodaySummary from './TodaySummary'
 const DAYS = 14
 
 function Stat({ label, value }) {
@@ -211,7 +211,7 @@ export default function Dashboard() {
             })}
           </section>
         )}
-
+        <TodaySummary bookings={bookings} onSelect={setSelected} />
         <section className="grid grid-cols-3 gap-3">
           <Stat label="Occupancy" value={`${occupancy}%`} />
           <Stat label="Arrivals today" value={arrivals} />

@@ -23,4 +23,5 @@ export const bookings = [
   { id: 4, roomId: 4, guest: 'Thoko', start: 3, nights: 5 },
   { id: 5, roomId: 5, guest: 'Kondwani', start: 0, nights: 2 },
   { id: 6, roomId: 5, guest: 'Limbani', start: 6, nights: 3 },
+    { id: 7, roomId: 2, guest: 'Blessings', start: -2, nights: 2 },
 ]

@@ -8,7 +8,7 @@ const base =
   window.location.hostname === 'localhost'
     ? LIVE_URL
     : window.location.origin
-const url = `${base}/#/book`
+const url = `${base}/#/rooms`
 
   return (
     <div className="min-h-screen bg-slate-100 p-4 text-slate-800 print:bg-white print:p-0">

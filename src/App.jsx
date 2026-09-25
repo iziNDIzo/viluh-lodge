@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Dashboard from './Dashboard'
 import GuestBooking from './GuestBooking'
 import QrCard from './QrCard'
+import RoomGallery from './RoomGallery'
 
 export default function App() {
   const [route, setRoute] = useState(window.location.hash)
@@ -14,5 +15,6 @@ export default function App() {
 
   if (route === '#/book') return <GuestBooking />
   if (route === '#/qr') return <QrCard />
+  if (route === '#/rooms') return <RoomGallery />
   return <Dashboard />
 }

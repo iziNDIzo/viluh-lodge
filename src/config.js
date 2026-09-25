@@ -19,7 +19,7 @@ const lodges = {
         type: 'Single',
         price: 35000,
         description: 'A cozy single room, ideal for solo travelers.',
-        image: 'https://picsum.photos/seed/livermark-room1/640/480',
+        image: 'b1.jpg',
       },
       {
         id: 2,
@@ -27,7 +27,7 @@ const lodges = {
         type: 'Double',
         price: 50000,
         description: 'Comfortable double room with ensuite bathroom.',
-        image: 'https://picsum.photos/seed/livermark-room2/640/480',
+        image: 'b5.jpg',
       },
       {
         id: 3,
@@ -35,7 +35,7 @@ const lodges = {
         type: 'Double',
         price: 50000,
         description: 'Bright double room, close to the main lounge.',
-        image: 'https://picsum.photos/seed/livermark-room3/640/480',
+        image: '/b1.jpg',
       },
       {
         id: 4,
@@ -43,7 +43,7 @@ const lodges = {
         type: 'Family',
         price: 75000,
         description: 'Spacious family room that sleeps up to four.',
-        image: 'https://picsum.photos/seed/livermark-room4/640/480',
+        image: '/b3.jpg',
       },
       {
         id: 5,
@@ -51,7 +51,7 @@ const lodges = {
         type: 'Lake view',
         price: 90000,
         description: 'Our best room, with a private balcony and lake view.',
-        image: 'https://picsum.photos/seed/livermark-room5/640/480',
+        image: 'b2.jpg',
       },
     ],
     // start = days from today, nights = length of stay

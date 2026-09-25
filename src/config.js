@@ -7,10 +7,10 @@ const palettes = {
 }
 
 const lodges = {
-  nezzer: {
-    name: 'Nezzer Lodge',
-    phone: '0884125795', // WhatsApp number guests message
-    liveUrl: 'https://viluh-lodge.vercel.app', // used by the QR card
+  livermark: {
+    name: 'Livermark Lodge',
+    phone: '0884125795', // update if this lodge uses a different number
+    liveUrl: 'https://viluh-lodge.vercel.app',
     palette: 'blue',
     rooms: [
       { id: 1, name: 'Room 1', type: 'Single', price: 35000 },
@@ -43,8 +43,8 @@ const lodges = {
 }
 
 // Which lodge this deployment shows. Set VITE_LODGE per Vercel project.
-const key = import.meta.env.VITE_LODGE || 'nezzer'
-export const lodge = lodges[key] || lodges.nezzer
+const key = import.meta.env.VITE_LODGE || 'livermark'
+export const lodge = lodges[key] || lodges.livermark
 
 // Applies the brand color and the browser tab title
 export function applyBrand() {
